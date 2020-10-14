@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use App\Payment;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -14,6 +15,8 @@ class BitPayController extends Controller
 
     public function pay(Request $request){
 
+        Log::info(config('app.url').'/ipn');
+
 
         // $baseUrl = BitPayController::BASE_URL;
         $resourceUrl = 'https://test.bitpay.com/invoices';
@@ -23,6 +26,8 @@ class BitPayController extends Controller
             'price' => $request->input('amount'),
             'orderId' => rand(),
             'redirectURL' => config('app.url').'/thankyou',
+            'notificationURL' => config('app.url').'/ipn',
+            'notificationEmail' => 'daud.csbt@email.com',
             'buyer' => [
                 'email' => 'fox.mulder@trustno.one',
                 'name' => 'Fox Mulder',
@@ -55,6 +60,8 @@ class BitPayController extends Controller
             $reason = $response->getReasonPhrase(); // OK
             $body = $response->getBody();
             $responseBody = json_decode($body->getContents());
+            // Log::info($responseBody);
+            // Log::info('-------------------');
             return Redirect::to($responseBody->data->url);
         } catch (Exception $e) {
             Log::error($e->getMessage());
@@ -66,5 +73,21 @@ class BitPayController extends Controller
 
     public function redirect(){
         return view('thankyou');
+    }
+
+    public function payment_status(){
+        $payments = Payment::all();
+        return view('payment_status')->with('payments', $payments);
+    }
+
+    public function ipn(Request $request){
+        Log::info($request->all());
+        $ipnArray = $request->all();
+        $payment = new Payment;
+        $payment->bitpay_id = $ipnArray['id'];
+        $payment->url =$ipnArray['url'];
+        $payment->status =$ipnArray['status'];
+        $payment->posData =$ipnArray['posData'];
+        $payment->save();
     }
 }

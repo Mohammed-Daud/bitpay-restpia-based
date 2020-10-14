@@ -16,4 +16,9 @@ Route::get('/', function () {
 });
 
 Route::post('pay','BitPayController@pay')->name('pay');
+Route::post('ipn','BitPayController@ipn')->name('ipn');
 Route::get('thankyou', 'BitPayController@redirect');
+Route::get('payment_status', 'BitPayController@payment_status');
+
+
+

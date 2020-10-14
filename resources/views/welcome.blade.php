@@ -11,12 +11,19 @@
         {{ csrf_field() }}
         <legend>Pay Here</legend>
     
-        <input type="hidden" name="amount" value="2">
+        <input type="hidden" name="amount" value="1">
         
         
     
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
+
+
+    <br>
+    <br><br><br>
+    
+    <a href="{{ url('payment_status') }}">check payment status</a>
+
     
 </body>
 </html>
